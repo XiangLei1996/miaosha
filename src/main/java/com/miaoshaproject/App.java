@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Hello world!
  *
  * 1.开启EnableAutoConfiguration注解，将启动类当成可配置的bean，并开启spring自动化配置
- * 2.@RestController = @ResponseBody + @Controller
+ * 2.@RestController = @ResponseBody + @controller
  * 3.MapperScan开启Mapper扫描 --- 这种方式下，自动生成的DAO包内的类无需Mapper注释？---为什么会自动装配失败？
  */
 //@EnableAutoConfiguration
