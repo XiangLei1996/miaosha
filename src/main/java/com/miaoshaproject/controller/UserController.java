@@ -8,24 +8,24 @@ import com.miaoshaproject.respones.CommonReturnType;
 import com.miaoshaproject.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 /**
  * Author: XiangL
  * Date: 2019/6/12 12:44
  * Version 1.0
+ *
+ * 继承BaseController
+ * BaseController中定义了自定义的处理Exception的方法和自定义的请求头类型
+ * 即用父类管理所有Controller的通用资源
  */
 @Controller("user")
 @RequestMapping("/user")
-public class UserController {
+public class UserController extends BaseController{
 
     @Autowired
     UserService userService;
@@ -37,11 +37,15 @@ public class UserController {
 
     /**
      * 手机注册，发送Otp短信（即手机验证码）
+     * consumes为指定能处理的请求数据格式，对应request中的Content-Type
      * @param telephone 注册的手机号
      * @return
+     *
+     * CrossOrigin注解用来处理浏览前拦截ajax跨域访问的问题
      */
-    @RequestMapping("/getotp")
+    @RequestMapping(path = {"/getotp"}, method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
+    @CrossOrigin
     public CommonReturnType getOtp(@RequestParam("telephone") String telephone){
         //按照一定规则，生成Otp验证码
         Random random = new Random();
@@ -92,26 +96,4 @@ public class UserController {
         return userVO;
     }
 
-    //定义exceptionHandler解决未被controller层吸收的exception
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public Object handlerException(HttpServletResponse response, Exception ex){
-
-        Map<String, Object> responseData = new HashMap<>();
-
-        if(ex instanceof  BusinessException){
-            //强转
-            BusinessException businessException = (BusinessException)ex;
-
-            responseData.put("errCode", businessException.getErrCode());
-            responseData.put("errMsg", businessException.getErrMsg());
-            return CommonReturnType.create(responseData, "fail");
-        }else{
-            responseData.put("errCode", EmBusinessError.UNKNOW_ERROR.getErrCode());
-            responseData.put("errMsg", EmBusinessError.UNKNOW_ERROR.getErrMsg());
-        }
-
-        return CommonReturnType.create(responseData, "fail");
-    }
 }
