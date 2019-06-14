@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Author: XiangL
@@ -72,6 +74,29 @@ public class ItemController extends BaseController{
         return CommonReturnType.create(itemVO);
     }
 
+    /**
+     * 商品列表页面浏览
+     * @return
+     */
+    @RequestMapping(path = {"/list"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public CommonReturnType listItem(){
+        List<ItemModel> itemModelList = itemService.listItem();
+
+        //使用stream API将list内的itemModel转化为ItemVO
+        List<ItemVO> itemVOList = itemModelList.stream().map(itemModel -> {
+            ItemVO itemVO = this.convertVOFromModel(itemModel);
+            return itemVO;
+        }).collect(Collectors.toList());
+
+        return CommonReturnType.create(itemVOList);
+    }
+
+    /**
+     * 领域模型与视图模型的转换方法
+     * @param itemModel
+     * @return
+     */
     private ItemVO convertVOFromModel(ItemModel itemModel){
         if(itemModel == null){
             return null;
