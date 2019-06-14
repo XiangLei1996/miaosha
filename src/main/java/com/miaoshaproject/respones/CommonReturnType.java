@@ -30,7 +30,7 @@ public class CommonReturnType {
 
         type.data = data;
         type.status = status;
-        System.out.println(type.status);
+//        System.out.println(type.status);
         return type;
     }
 

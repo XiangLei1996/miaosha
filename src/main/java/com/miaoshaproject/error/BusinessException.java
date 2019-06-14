@@ -48,4 +48,5 @@ public class BusinessException extends Exception implements CommonError{
         this.commonError.setErrMsg(errMsg);
         return this;
     }
+
 }

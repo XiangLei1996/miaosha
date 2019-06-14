@@ -50,4 +50,6 @@ public interface UserDOMapper {
      * @mbg.generated Tue Jun 11 14:39:58 CST 2019
      */
     int updateByPrimaryKey(UserDO record);
+
+    UserDO selectByTelephone(String telephone);
 }
