@@ -41,6 +41,10 @@ public interface ItemStockDOMapper {
      *
      * @mbg.generated Fri Jun 14 09:33:50 CST 2019
      */
+    //通过itemId获取对应的库存数量
+    ItemStockDO selectByItemId(Integer itemId);
+
+
     int updateByPrimaryKeySelective(ItemStockDO record);
 
     /**

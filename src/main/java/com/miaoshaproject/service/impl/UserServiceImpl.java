@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
         UserDO userDO = userDOMapper.selectByPrimaryKey(id);
         UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(id);
 
-        return convertFromDataObject(userDO, userPasswordDO);
+        return this.convertFromDataObject(userDO, userPasswordDO);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(EmBusinessError.USER_LOGIN_FIAL);
         }
 
-        UserModel userModel = convertFromDataObject(userDO, userPasswordDO);
+        UserModel userModel = this.convertFromDataObject(userDO, userPasswordDO);
         return userModel;
     }
 
@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
         userModel.setId(userDO.getId());
 
         //密码存放到特殊的单表中（封装该部分方法，以便复用），理论上还需要通过MD5算法加密
-        UserPasswordDO userPasswordDO = convertPasswordFromModel(userModel);
+        UserPasswordDO userPasswordDO = this.convertPasswordFromModel(userModel);
         userPasswordDOMapper.insertSelective(userPasswordDO);
 
         return;
