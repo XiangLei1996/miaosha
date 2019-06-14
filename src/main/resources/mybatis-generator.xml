@@ -24,11 +24,19 @@
 
         <!-- 生成对应表及类名 -->
         <!-- 关闭生成的Mapper中多余的复杂查询以及Example类 -->
-        <table tableName="user_info" domainObjectName="UserDO"
+        <!--<table tableName="user_info" domainObjectName="UserDO"-->
+               <!--enableCountByExample="false" enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false" enableUpdateByExample="false"-->
+               <!--selectByExampleQueryId="false" />-->
+        <!--<table tableName="user_password" domainObjectName="UserPasswordDO"-->
+               <!--enableCountByExample="false" enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false" enableUpdateByExample="false"-->
+               <!--selectByExampleQueryId="false" />-->
+        <table tableName="item" domainObjectName="ItemDO"
                enableCountByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" enableUpdateByExample="false"
                selectByExampleQueryId="false" />
-        <table tableName="user_password" domainObjectName="UserPasswordDO"
+        <table tableName="item_stock" domainObjectName="ItemStockDO"
                enableCountByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" enableUpdateByExample="false"
                selectByExampleQueryId="false" />
