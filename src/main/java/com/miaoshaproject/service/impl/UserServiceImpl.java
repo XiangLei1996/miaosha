@@ -9,10 +9,13 @@ import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.model.UserModel;
 import com.miaoshaproject.service.UserService;
+import com.miaoshaproject.validator.ValidationResult;
+import com.miaoshaproject.validator.ValidatorImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Author: XiangL
@@ -23,10 +26,13 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    UserDOMapper userDOMapper;
+    private UserDOMapper userDOMapper;
 
     @Autowired
-    UserPasswordDOMapper userPasswordDOMapper;
+    private UserPasswordDOMapper userPasswordDOMapper;
+
+    @Autowired
+    private ValidatorImpl validator;
 
     //通过id获取用户服务
     @Override
@@ -56,15 +62,20 @@ public class UserServiceImpl implements UserService {
 
     //注册服务
     @Override
+    @Transactional
     public void register(UserModel userModel) throws BusinessException{
         if(userModel == null){
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
-        if(StringUtils.isEmpty(userModel.getName())
-                || userModel.getGender() == null
-                || userModel.getAge() == null
-                || StringUtils.isEmpty(userModel.getTelephone())){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "参数不合法");
+//        if(StringUtils.isEmpty(userModel.getName())
+//                || userModel.getGender() == null
+//                || userModel.getAge() == null
+//                || StringUtils.isEmpty(userModel.getTelephone())){
+//            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "参数不合法");
+//        }
+        ValidationResult result = validator.validate(userModel);
+        if(result.isHasErrors()){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, result.getErrMsg());
         }
 
 

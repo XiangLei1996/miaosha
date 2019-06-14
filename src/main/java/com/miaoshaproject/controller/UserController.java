@@ -38,12 +38,12 @@ import java.util.Random;
 public class UserController extends BaseController{
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     //自动注入的httpServletRequest时，单例模式不会影响多并发访问，
     //因为通过Bean注入的该对象，其本质是一个proxy，里面有一个ThreadLocal
     @Autowired
-    HttpServletRequest httpServletRequest;
+    private HttpServletRequest httpServletRequest;
 
     @RequestMapping(path = {"/login"}, method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
