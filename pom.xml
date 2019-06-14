@@ -150,7 +150,7 @@
             <!-- 允许移动生成的文件 -->
             <verbose>true</verbose>
             <!-- 允许自动覆盖，但实际开发时不能设置为true -->
-            <overwrite>true</overwrite>
+            <overwrite>false</overwrite>
 
             <!--指定mybatis配置文件的路径-->
             <configurationFile>
