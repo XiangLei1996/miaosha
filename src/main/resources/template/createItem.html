@@ -101,11 +101,11 @@
                     if(data.status == "success"){
                         alert("创建成功");
                     }else{
-                        alert("创建失败，原因为" + data.data.errMsg + "data.errMsg");
+                        alert("创建失败，原因为" + data.data.errMsg);
                     }
                 },
                 fail:function (data) {
-                    alert("创建失败，原因为"+data.responseText + "data.responseText");
+                    alert("创建失败，原因为"+data.responseText);
                 }
             });
             return false;

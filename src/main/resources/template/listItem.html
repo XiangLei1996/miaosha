@@ -52,11 +52,11 @@
                         g_itemList = data.data;
                         reloadDom();
                     }else{
-                        alert("获取商品信息失败，原因为" + data.data.errMsg + "data.errMsg");
+                        alert("获取商品信息失败，原因为" + data.data.errMsg);
                     }
                 },
                 fail:function (data) {
-                    alert("获取商品信息失败，原因为"+data.responseText + "data.responseText");
+                    alert("获取商品信息失败，原因为"+data.responseText);
                 }
             });
         });

@@ -9,6 +9,8 @@ package com.miaoshaproject.error;
  * 类中通过枚举指定多种不同类型的参数
  *
  * 注意：枚举类型之间使用 逗号 相分隔
+ *
+ * commonError的具体类EmBusinessError也要重写getErrMsg等方法以供外部获取错误信息
  */
 public enum EmBusinessError implements CommonError {
 
@@ -36,12 +38,12 @@ public enum EmBusinessError implements CommonError {
 
     @Override
     public int getErrCode() {
-        return 0;
+        return this.errCode;
     }
 
     @Override
     public String getErrMsg() {
-        return null;
+        return this.errMsg;
     }
 
     /**

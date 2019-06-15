@@ -118,11 +118,11 @@
                         window.location.reload();
                         reloadDom();
                     }else{
-                        alert("下单失败，原因为" + data.data.errMsg + "data.errMsg");
+                        alert("下单失败，原因为" + data.data.errMsg);
                     }
                 },
                 fail:function (data) {
-                    alert("下单失败，原因为"+data.responseText + "data.responseText");
+                    alert("下单失败，原因为"+data.responseText);
                 }
             });
         });

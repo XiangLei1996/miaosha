@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +16,10 @@ import java.util.Map;
  * Author: XiangL
  * Date: 2019/6/13 11:54
  * Version 1.0
+ *
+ * 修复bug，
+ * 1.HttpServletRequest 不下心写成了 HttpServletResponse
+ * 2.BaseController的处理异常方法中，businessException中的方法没有重写，导致无法获取对应的值
  */
 public class BaseController {
 
@@ -25,7 +29,7 @@ public class BaseController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public Object handlerException(HttpServletResponse response, Exception ex){
+    public Object handlerException(HttpServletRequest request, Exception ex){
 
         Map<String, Object> responseData = new HashMap<>();
 
@@ -33,9 +37,9 @@ public class BaseController {
             //强转
             BusinessException businessException = (BusinessException)ex;
 
+
             responseData.put("errCode", businessException.getErrCode());
             responseData.put("errMsg", businessException.getErrMsg());
-            return CommonReturnType.create(responseData, "fail");
         }else{
             responseData.put("errCode", EmBusinessError.UNKNOW_ERROR.getErrCode());
             responseData.put("errMsg", EmBusinessError.UNKNOW_ERROR.getErrMsg());

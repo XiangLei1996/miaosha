@@ -54,11 +54,11 @@
                         alert("otp已经发送到您的手机上，请注意查收");
                         window.location.href = "http://localhost:63342/miaosha/template/register.html";
                     }else{
-                        alert("otp发送失败，原因为" + data.data.errMsg + "data.errMsg");
+                        alert("otp发送失败，原因为" + data.data.errMsg);
                     }
                 },
                 fail:function (data) {
-                    alert("otp发送失败，原因为"+data.responseText + "data.responseText");
+                    alert("otp发送失败，原因为"+data.responseText);
                 }
             });
             return false;

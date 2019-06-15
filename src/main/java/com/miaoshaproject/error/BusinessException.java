@@ -13,6 +13,8 @@ package com.miaoshaproject.error;
  *
  * BusinessException和EmBusinessError都实现了CommonError的方法
  * 以至于都拥有errCode和errMsg的组装定义
+ *
+ *  为了直接通过BusinessException对象获得相应的错误信息，需要重写getErrCode等方法
  */
 //包装器业务类异常实现
 public class BusinessException extends Exception implements CommonError{
@@ -35,12 +37,12 @@ public class BusinessException extends Exception implements CommonError{
 
     @Override
     public int getErrCode() {
-        return 0;
+        return this.commonError.getErrCode();
     }
 
     @Override
     public String getErrMsg() {
-        return null;
+        return this.commonError.getErrMsg();
     }
 
     @Override
