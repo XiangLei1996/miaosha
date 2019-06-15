@@ -49,6 +49,11 @@
                 <label class="control-label" id="sales"/>
             </div>
         </div>
+        <div class="form-actions">
+            <button class="btn blue" id="createOrder" type="submit">
+                下单
+            </button>
+        </div>
     </div>
 
 </body>
@@ -84,12 +89,43 @@
                         reloadDom();
                     }else{
                         alert("获取信息失败，原因为" + data.data.errMsg + "data.errMsg");
+                        if(data.data.errCode == 20003){
+                            window.location.href="login.html";
+                        }
                     }
                 },
                 fail:function (data) {
                     alert("获取信息失败，原因为"+data.responseText + "data.responseText");
                 }
             });
+    });
+
+    jQuery(document).ready(function(){
+        $("#createOrder").on("click", function(){
+            $.ajax({
+                //ajax请求头
+                type:"POST",
+                contentType:"application/x-www-form-urlencoded",
+                url:"http://localhost:8090/order/createorder",
+                data:{
+                    "itemId":g_itemVO.id,
+                    "amount":1
+                },
+                xhrFields:{withCredentials:true},//用于指定允许跨域传输
+                success:function (data) {
+                    if(data.status == "success"){
+                        alert("下单成功");
+                        window.location.reload();
+                        reloadDom();
+                    }else{
+                        alert("下单失败，原因为" + data.data.errMsg + "data.errMsg");
+                    }
+                },
+                fail:function (data) {
+                    alert("下单失败，原因为"+data.responseText + "data.responseText");
+                }
+            });
+        });
     });
 
     function reloadDom() {

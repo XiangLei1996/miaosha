@@ -155,4 +155,13 @@
       img_url = #{imgUrl,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <update id="increaseSales" parameterType="java.lang.Integer">
+    <!--
+    更新商品销量
+    -->
+    update item
+    set sales = sales + #{amount}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
 </mapper>

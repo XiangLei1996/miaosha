@@ -32,11 +32,19 @@
                <!--enableCountByExample="false" enableDeleteByExample="false"-->
                <!--enableSelectByExample="false" enableUpdateByExample="false"-->
                <!--selectByExampleQueryId="false" />-->
-        <table tableName="item" domainObjectName="ItemDO"
-               enableCountByExample="false" enableDeleteByExample="false"
-               enableSelectByExample="false" enableUpdateByExample="false"
-               selectByExampleQueryId="false" />
-        <table tableName="item_stock" domainObjectName="ItemStockDO"
+        <!--<table tableName="item" domainObjectName="ItemDO"-->
+               <!--enableCountByExample="false" enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false" enableUpdateByExample="false"-->
+               <!--selectByExampleQueryId="false" />-->
+        <!--<table tableName="item_stock" domainObjectName="ItemStockDO"-->
+               <!--enableCountByExample="false" enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false" enableUpdateByExample="false"-->
+               <!--selectByExampleQueryId="false" />-->
+        <!--<table tableName="order_info" domainObjectName="OrderDO"-->
+               <!--enableCountByExample="false" enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false" enableUpdateByExample="false"-->
+               <!--selectByExampleQueryId="false" />-->
+        <table tableName="sequence_info" domainObjectName="SequenceDO"
                enableCountByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" enableUpdateByExample="false"
                selectByExampleQueryId="false" />

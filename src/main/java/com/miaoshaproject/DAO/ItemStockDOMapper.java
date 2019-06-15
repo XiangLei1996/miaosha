@@ -1,6 +1,7 @@
 package com.miaoshaproject.DAO;
 
 import com.miaoshaproject.DO.ItemStockDO;
+import org.apache.ibatis.annotations.Param;
 
 public interface ItemStockDOMapper {
     /**
@@ -43,6 +44,14 @@ public interface ItemStockDOMapper {
      */
     //通过itemId获取对应的库存数量
     ItemStockDO selectByItemId(Integer itemId);
+
+    /**
+     * 这里的 MyBatis 接口绑定中， 采用@Param传递多参数的方法；MyBatis传递多参数的方法有哪些？
+     * @param itemId
+     * @param amount
+     * @return 操作正常返回值为1，不正常为0，Service层可通过返回值判断
+     */
+    int decreaseStock(@Param("itemId") Integer itemId, @Param("amount") Integer amount);
 
 
     int updateByPrimaryKeySelective(ItemStockDO record);
