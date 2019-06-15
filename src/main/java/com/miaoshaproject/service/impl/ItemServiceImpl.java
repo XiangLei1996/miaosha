@@ -7,7 +7,9 @@ import com.miaoshaproject.DO.ItemStockDO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.model.ItemModel;
+import com.miaoshaproject.model.PromoModel;
 import com.miaoshaproject.service.ItemService;
+import com.miaoshaproject.service.PromoService;
 import com.miaoshaproject.validator.ValidationResult;
 import com.miaoshaproject.validator.ValidatorImpl;
 import org.springframework.beans.BeanUtils;
@@ -37,6 +39,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ItemStockDOMapper itemStockDOMapper;
+
+    @Autowired
+    private PromoService promoService;
 
 
     //涉及修改数据库，要开启事务
@@ -108,6 +113,13 @@ public class ItemServiceImpl implements ItemService {
 
         //将data Object 转换为 Model
         ItemModel itemModel = convertModelFromDataObject(itemDO, itemStockDO);
+
+        //获取活动商品信息---用于秒杀业务
+        PromoModel promoModel = promoService.getPromoByItemId(itemModel.getId());
+        if(promoModel != null && promoModel.getStatus().intValue() != 3){
+            //存在配置了秒杀活动且秒杀活动还未结束（即未开始或正在进行）的商品
+            itemModel.setPromoModel(promoModel);
+        }
 
         return itemModel;
     }
