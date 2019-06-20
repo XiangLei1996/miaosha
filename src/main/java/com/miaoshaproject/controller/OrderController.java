@@ -6,7 +6,9 @@ import com.miaoshaproject.model.OrderModel;
 import com.miaoshaproject.model.UserModel;
 import com.miaoshaproject.respones.CommonReturnType;
 import com.miaoshaproject.service.OrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,20 +32,34 @@ public class OrderController extends BaseController{
     @Autowired
     private HttpServletRequest httpServletRequest;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     //封装下单请求
     @RequestMapping(path = {"/createorder"}, method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType createOrder(@RequestParam("itemId") Integer itemId,
                                         @RequestParam("amount") Integer amount,
                                         @RequestParam(value = "promoId", required = false) Integer promoId) throws BusinessException {
-        //判断用户是否登录
-        Boolean isLogin = (Boolean)httpServletRequest.getSession().getAttribute("IS_LOGIN");
-        if(isLogin == null || !isLogin.booleanValue()){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "请先登录用户");
+        //判断用户是否登录，使用token方法后注释
+        //Boolean isLogin = (Boolean)httpServletRequest.getSession().getAttribute("IS_LOGIN");
+//        if(isLogin == null || !isLogin.booleanValue()){
+//            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "请先登录用户");
+//        }
+        //获取用户登录信息--注意需要强转类型---值是在用户登录存储在对应的request的session里的
+        //UserModel userModel = (UserModel) httpServletRequest.getSession().getAttribute("LOGIN_USER");
+
+        //使用token验证登录
+        String token = httpServletRequest.getParameterMap().get("token")[0];
+        if(StringUtils.isEmpty(token)){
+            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "请先登录用户");
+        }
+        //获取用户登录信息也通过token去redis中寻找
+        UserModel userModel = (UserModel) redisTemplate.opsForValue().get(token);
+        if(userModel == null){
+            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "请先登录用户");
         }
 
-        //获取用户登录信息--注意需要强转类型---值是在用户登录存储在对应的request的session里的
-        UserModel userModel = (UserModel) httpServletRequest.getSession().getAttribute("LOGIN_USER");
 
         OrderModel orderModel = orderService.createOrder(userModel.getId(), itemId, amount, promoId);
 

@@ -4,13 +4,18 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * Author: XiangL
  * Date: 2019/6/12 12:56
  * Version 1.0
+ *
+ * 要存入Redis必须实现序列化
+ * 1.可以实现序列化接口
+ * 2.可以修改redis中的序列化方式，修改为json
  */
-public class UserModel {
+public class UserModel implements Serializable {
     private Integer id;
     //引入注释，表示对应字符串不能为空和null，里面参数为validator校验时发现错误后会给出的信息
     @NotBlank(message="用户名不能为空")

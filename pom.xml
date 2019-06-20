@@ -75,6 +75,17 @@
       <artifactId>joda-time</artifactId>
       <version>2.9.1</version>
     </dependency>
+      <!--引入springboot对应redis的依赖
+      用于分布式session实现；为了得到更多的控制权限,配置RedisConfig-->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.session</groupId>
+      <artifactId>spring-session-data-redis</artifactId>
+      <version>2.0.5.RELEASE</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -197,6 +208,10 @@
                   <source>8</source>
                   <target>8</target>
               </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
           </plugin>
       </plugins>
   </build>
