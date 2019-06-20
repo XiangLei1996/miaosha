@@ -2,6 +2,7 @@ package com.miaoshaproject.model;
 
 import org.joda.time.DateTime;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
@@ -11,7 +12,7 @@ import java.math.BigDecimal;
  *
  * 秒杀营销模型  Promote营销,推广？
  */
-public class PromoModel {
+public class PromoModel implements Serializable {
 
     private Integer id;
 
