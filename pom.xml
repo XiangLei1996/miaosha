@@ -86,6 +86,12 @@
       <artifactId>spring-session-data-redis</artifactId>
       <version>2.0.5.RELEASE</version>
     </dependency>
+    <!--用于本地热点缓存的依赖包；这个包其实是谷歌想要重新定义一些java的数据结构-->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>18.0</version>
+    </dependency>
   </dependencies>
 
   <build>

@@ -4,6 +4,7 @@ import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.model.ItemModel;
 import com.miaoshaproject.model.viewobject.ItemVO;
 import com.miaoshaproject.respones.CommonReturnType;
+import com.miaoshaproject.service.CacheService;
 import com.miaoshaproject.service.ItemService;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +34,9 @@ public class ItemController extends BaseController{
 
     @Autowired
     private RedisTemplate redisTemplate;//该类中封装了spring中对redis的各种操作
+
+    @Autowired
+    private CacheService cacheService;
 
     /**
      * 创建商品，需提供商品的对应信息
@@ -73,16 +77,25 @@ public class ItemController extends BaseController{
     @RequestMapping(path = {"/get"}, method = {RequestMethod.GET})
     @ResponseBody
     public CommonReturnType getItem(@RequestParam("id") Integer id){
+        ItemModel itemModel = null;
 
-        //根据商品的id到redis内获取
-        ItemModel itemModel = (ItemModel) redisTemplate.opsForValue().get("item_"+id);
+        //1.先从本地缓存中查找数据
+        itemModel = (ItemModel) cacheService.getFromCommonCache("item_"+id);
 
-        //若redis内不存在对应的itemModel，则访问下游的Service
-        if(itemModel == null){
-            itemModel = itemService.getItemById(id);
-            //设置itemModel到redis内,同时设置10分钟过期
-            redisTemplate.opsForValue().set("item_"+id, itemModel);
-            redisTemplate.expire("item_"+id, 10, TimeUnit.MINUTES);
+        //2.若本地缓存不存在，则去redis中查找
+        if(itemModel == null) {
+            //根据商品的id到redis内获取
+            itemModel = (ItemModel) redisTemplate.opsForValue().get("item_" + id);
+
+            //3.redis内不存在对应的itemModel，则访问数据库
+            if (itemModel == null) {
+                itemModel = itemService.getItemById(id);
+                //填充redis缓存,同时设置10分钟过期
+                redisTemplate.opsForValue().set("item_" + id, itemModel);
+                redisTemplate.expire("item_" + id, 10, TimeUnit.MINUTES);
+            }
+            //填充本地缓存（通过service层我们自定义了60秒过期）
+            cacheService.setCommonCache("item_" + id, itemModel);
         }
 
         ItemVO itemVO = convertVOFromModel(itemModel);
