@@ -8,6 +8,7 @@ import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.model.ItemModel;
 import com.miaoshaproject.model.PromoModel;
+import com.miaoshaproject.mq.MqProducer;
 import com.miaoshaproject.service.ItemService;
 import com.miaoshaproject.service.PromoService;
 import com.miaoshaproject.validator.ValidationResult;
@@ -48,6 +49,10 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    //注意，这里需要导入的时我们自定义的类，不是rocketMQ自带的
+    @Autowired
+    private MqProducer mqProducer;
+
 
     @Override
     public ItemModel getItemByIdInCache(Integer id) {
@@ -62,15 +67,27 @@ public class ItemServiceImpl implements ItemService {
     }
 
     //涉及修改数据库，要开启事务
+    //2.使用redis缓存商品库存后，一旦下单导致需要更新数据库库存时，需要同步更新redis
     @Override
     @Transactional
     public boolean decreaseStock(Integer itemId, Integer amount) {
-        int affectedRow = itemStockDOMapper.decreaseStock(itemId, amount);
-        if(affectedRow > 0){
+        //int affectedRow = itemStockDOMapper.decreaseStock(itemId, amount);
+        /*使用increment一个 -1 即减1;返回的result为更新手剩余的值*/
+        long result = redisTemplate.opsForValue().increment("promo_item_stock_"+itemId,amount.intValue()*-1);
+//        if(affectedRow > 0){
+        if(result >= 0){
             //更新库存成功
+            //异步消息同步数据库库存优化;发送消息若失败则需要还原库存
+            boolean mqResult = mqProducer.asyncReduceStock(itemId, amount);
+            if(!mqResult){
+                //+1还原库存
+                redisTemplate.opsForValue().increment("promo_item_stock_"+itemId,amount.intValue());
+                return false;
+            }
             return true;
         }else{
-            //更新库存失败
+            //更新库存失败--result<0，代表没有库存了
+            redisTemplate.opsForValue().increment("promo_item_stock_"+itemId,amount.intValue());
             return false;
         }
     }

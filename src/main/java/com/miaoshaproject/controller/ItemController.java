@@ -6,6 +6,7 @@ import com.miaoshaproject.model.viewobject.ItemVO;
 import com.miaoshaproject.respones.CommonReturnType;
 import com.miaoshaproject.service.CacheService;
 import com.miaoshaproject.service.ItemService;
+import com.miaoshaproject.service.PromoService;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,17 @@ public class ItemController extends BaseController{
 
     @Autowired
     private CacheService cacheService;
+
+    @Autowired
+    private PromoService promoService;
+
+    //发布活动商品
+    @RequestMapping(path = {"/publishpromo"}, method = {RequestMethod.GET})
+    @ResponseBody
+    public CommonReturnType publishPromo(@RequestParam("id") Integer id){
+        promoService.publishPromo(id);
+        return CommonReturnType.create(null);
+    }
 
     /**
      * 创建商品，需提供商品的对应信息
