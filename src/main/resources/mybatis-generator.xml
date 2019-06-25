@@ -48,7 +48,11 @@
                <!--enableCountByExample="false" enableDeleteByExample="false"-->
                <!--enableSelectByExample="false" enableUpdateByExample="false"-->
                <!--selectByExampleQueryId="false" />-->
-        <table tableName="promo" domainObjectName="PromoDO"
+        <!--<table tableName="promo" domainObjectName="PromoDO"-->
+               <!--enableCountByExample="false" enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false" enableUpdateByExample="false"-->
+               <!--selectByExampleQueryId="false" />-->
+        <table tableName="stock_log" domainObjectName="StockLogDO"
                enableCountByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" enableUpdateByExample="false"
                selectByExampleQueryId="false" />

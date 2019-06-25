@@ -15,5 +15,5 @@ public interface OrderService {
     2。直接在下单接口内判断对应的商品是否存在秒杀活动，若存在进行中的则以秒杀价格下单
     各有优点，推荐使用第一种。同一款商品可能存在不同秒杀活动？（便于扩展）如果用第二种，平销商品也要查询
      */
-    OrderModel createOrder(Integer userId, Integer ItemId, Integer amount, Integer promoId) throws BusinessException;
+    OrderModel createOrder(Integer userId, Integer ItemId, Integer amount, Integer promoId, String stockLogId) throws BusinessException;
 }

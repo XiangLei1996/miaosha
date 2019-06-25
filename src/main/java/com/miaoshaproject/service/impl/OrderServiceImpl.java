@@ -2,8 +2,10 @@ package com.miaoshaproject.service.impl;
 
 import com.miaoshaproject.DAO.OrderDOMapper;
 import com.miaoshaproject.DAO.SequenceDOMapper;
+import com.miaoshaproject.DAO.StockLogDOMapper;
 import com.miaoshaproject.DO.OrderDO;
 import com.miaoshaproject.DO.SequenceDO;
+import com.miaoshaproject.DO.StockLogDO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.model.ItemModel;
@@ -43,10 +45,14 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private SequenceDOMapper sequenceDOMapper;
 
+    @Autowired
+    private StockLogDOMapper stockLogDOMapper;
 
+
+    //改写,需要加上一个 stockLogId
     @Override
     @Transactional
-    public OrderModel createOrder(Integer userId, Integer itemId, Integer amount, Integer promoId) throws BusinessException {
+    public OrderModel createOrder(Integer userId, Integer itemId, Integer amount, Integer promoId, String stockLogId) throws BusinessException {
         //1.校验下单状态，下单的商品是否存在，用户是否合法，购买数量是否正确
         //ItemModel itemModel = itemService.getItemById(itemId);
         //使用优化缓存模型
@@ -109,12 +115,42 @@ public class OrderServiceImpl implements OrderService {
         //订单表入库后，加上商品的销量（实际情况下等到支付完成再处理）
         itemService.increaseSales(itemId, amount);
 
+        //设置库存流水状态为成功----由于对应的下单操作和设置流水状态在同一个事务内，所以只要订单成功入库，那么流水状态肯定也设置成功
+        StockLogDO stockLogDO = stockLogDOMapper.selectByPrimaryKey(stockLogId);
+        //其实肯定不会为空，因为在上层的controller中，只有先初始化库存流水，才会调用事务型下单消息机制
+        //但这里也可以做一个保护
+        if(stockLogDO == null){
+            throw new BusinessException(EmBusinessError.UNKNOW_ERROR);
+        }
+        stockLogDO.setStatus(2);//2表示下单扣减库存成功
+        stockLogDOMapper.updateByPrimaryKeySelective(stockLogDO);
+
+
+
+//        //借用Spring提供的组件
+//        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+//
+//            //该方法会在最近的Transactional注解标注的事务成功提交后，才执行里面的方法体
+//            @Override
+//            public void afterCommit() {
+//                //将异步更新库存的实现放入该方法内，以避免事务提交出错（不是执行失败）带来的库存减少
+//                //此时无法回滚库存了，因此要保证消息发送一定成功
+//                boolean mqResult = itemService.asyncDecreaseStock(itemId, amount);
+////                if(!mqResult){
+////                    //失败，回滚
+////                    itemService.increaseStock(itemId, amount);
+////                    throw new BusinessException(EmBusinessError.MQ_SEND_FAIL);
+////                }
+//
+//            }
+//        });
+
         //4.返回前端
         return orderModel;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private String generateOrderNo(){
+    public String generateOrderNo(){
         //订单号有16位--老师用的是StringBuilder，但是此处用的StringBuffer
         StringBuffer stringBuffer = new StringBuffer();
         //前8位有时间信息，年月日

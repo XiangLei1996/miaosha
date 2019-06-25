@@ -2,8 +2,10 @@ package com.miaoshaproject.service.impl;
 
 import com.miaoshaproject.DAO.ItemDOMapper;
 import com.miaoshaproject.DAO.ItemStockDOMapper;
+import com.miaoshaproject.DAO.StockLogDOMapper;
 import com.miaoshaproject.DO.ItemDO;
 import com.miaoshaproject.DO.ItemStockDO;
+import com.miaoshaproject.DO.StockLogDO;
 import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.model.ItemModel;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -53,6 +56,32 @@ public class ItemServiceImpl implements ItemService {
     @Autowired
     private MqProducer mqProducer;
 
+    @Autowired
+    private StockLogDOMapper stockLogDOMapper;
+
+    //初始化对应的库存流水,并返回对应流水的主键id stock_log_id
+    @Override
+    @Transactional
+    public String initStockLog(Integer itemId, Integer amount) {
+        StockLogDO stockLogDO = new StockLogDO();
+        stockLogDO.setItemId(itemId);
+        stockLogDO.setAmount(amount);
+        //使用UUID作为主键，记得要替换 -
+        stockLogDO.setStockLogId(UUID.randomUUID().toString().replace("-",""));
+        stockLogDO.setStatus(1);
+
+        //插入初始化的库存流水记录
+        stockLogDOMapper.insertSelective(stockLogDO);
+
+        return stockLogDO.getStockLogId();
+    }
+
+    //异步更新库存操作
+    @Override
+    public boolean asyncDecreaseStock(Integer itemId, Integer amount) {
+        boolean mqResult = mqProducer.asyncReduceStock(itemId, amount);
+        return mqResult;
+    }
 
     @Override
     public ItemModel getItemByIdInCache(Integer id) {
@@ -66,6 +95,13 @@ public class ItemServiceImpl implements ItemService {
         return itemModel;
     }
 
+    //库存回滚
+    @Override
+    public boolean increaseStock(Integer itemId, Integer amount) {
+        redisTemplate.opsForValue().increment("promo_item_stock_"+itemId,amount.intValue()*1);
+        return true;
+    }
+
     //涉及修改数据库，要开启事务
     //2.使用redis缓存商品库存后，一旦下单导致需要更新数据库库存时，需要同步更新redis
     @Override
@@ -75,19 +111,18 @@ public class ItemServiceImpl implements ItemService {
         /*使用increment一个 -1 即减1;返回的result为更新手剩余的值*/
         long result = redisTemplate.opsForValue().increment("promo_item_stock_"+itemId,amount.intValue()*-1);
 //        if(affectedRow > 0){
-        if(result >= 0){
+        if(result > 0){
             //更新库存成功
-            //异步消息同步数据库库存优化;发送消息若失败则需要还原库存
-            boolean mqResult = mqProducer.asyncReduceStock(itemId, amount);
-            if(!mqResult){
-                //+1还原库存
-                redisTemplate.opsForValue().increment("promo_item_stock_"+itemId,amount.intValue());
-                return false;
-            }
+            return true;
+        }else if(result == 0){
+            //添加库存已售罄标识
+            redisTemplate.opsForValue().set("promo_item_stock_invalid_"+itemId, "true");
+
+            //更新库存成功
             return true;
         }else{
             //更新库存失败--result<0，代表没有库存了
-            redisTemplate.opsForValue().increment("promo_item_stock_"+itemId,amount.intValue());
+            increaseStock(itemId, amount);
             return false;
         }
     }
