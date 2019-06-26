@@ -80,8 +80,12 @@ public class OrderController extends BaseController{
         }
 
         Map<String, Object> map = CodeUtil.generateCodeAndPic();
+
         //并将该验证码与用户做一个绑定
         redisTemplate.opsForValue().set("verify_code_"+userModel.getId(), map.get("code"));
+        //设置验证码有效期
+        redisTemplate.expire("verify_code_"+userModel.getId(), 10, TimeUnit.MINUTES);
+
         //将生成的图片写到httpServletResponse中，返回给前端
         ImageIO.write((RenderedImage) map.get("codePic"), "jpeg", response.getOutputStream());
     }
@@ -103,6 +107,17 @@ public class OrderController extends BaseController{
         if(userModel == null){
             throw new BusinessException(EmBusinessError.USER_NOT_LOGIN, "请先登录用户");
         }
+
+        //通过verifycode验证验证码的有效性
+        String redisVerifyCode = (String) redisTemplate.opsForValue().get("verify_code_"+userModel.getId());
+        if(StringUtils.isEmpty(redisVerifyCode)){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "请填写验证码");
+        }
+        //equalsIgnoreCase无视大小写区别
+        if(!redisVerifyCode.equalsIgnoreCase(verifyCode)){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "验证码错误");
+        }
+
 
         //获取秒杀访问令牌
         String promoToken = promoService.generateSecondKillToken(promoId, itemId, userModel.getId());
