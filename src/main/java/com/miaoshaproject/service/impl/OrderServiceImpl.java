@@ -10,7 +10,6 @@ import com.miaoshaproject.error.BusinessException;
 import com.miaoshaproject.error.EmBusinessError;
 import com.miaoshaproject.model.ItemModel;
 import com.miaoshaproject.model.OrderModel;
-import com.miaoshaproject.model.UserModel;
 import com.miaoshaproject.service.ItemService;
 import com.miaoshaproject.service.OrderService;
 import com.miaoshaproject.service.UserService;
@@ -49,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
     private StockLogDOMapper stockLogDOMapper;
 
 
+
     //改写,需要加上一个 stockLogId
     @Override
     @Transactional
@@ -61,27 +61,28 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "商品信息不存在");
         }
 
-        //UserModel userModel = userService.getUserById(userId);
-        //使用缓存模型优化
-        UserModel userModel = userService.getUserByIdInCache(userId);
-        if(userModel == null){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "用户不存在");
-        }
+//
+//        //UserModel userModel = userService.getUserById(userId);
+//        //使用缓存模型优化
+//        UserModel userModel = userService.getUserByIdInCache(userId);
+//        if(userModel == null){
+//            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "用户不存在");
+//        }
 
         if(amount <= 0 || amount > 99){
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "请填写正确数量信息");
         }
 
-        //校验秒杀活动信息
-        if(promoId != null){
-            //（1）校验对应活动是否存在这个适应商品
-            if(promoId.intValue() != itemModel.getPromoModel().getId()){
-                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "活动信息不正确");
-                //校验活动是否正在进行中
-            }else if(itemModel.getPromoModel().getStatus().intValue() != 2){
-                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "活动还未开始");
-            }
-        }
+//        //校验秒杀活动信息
+//        if(promoId != null){
+//            //（1）校验对应活动是否存在这个适应商品
+//            if(promoId.intValue() != itemModel.getPromoModel().getId()){
+//                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "活动信息不正确");
+//                //校验活动是否正在进行中
+//            }else if(itemModel.getPromoModel().getStatus().intValue() != 2){
+//                throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR, "活动还未开始");
+//            }
+//        }
 
 
         //也可以支付减库存，即落单时只查看库存，但支付时可能库存不够
