@@ -31,6 +31,8 @@ public class RedisConfig {
         RedisTemplate redisTemplate = new RedisTemplate();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
+        // 测试提交
+
         //首先解决key的序列化方式
         StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
         redisTemplate.setKeySerializer(stringRedisSerializer);
